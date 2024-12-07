@@ -11,68 +11,88 @@ public class Main {
         try {
             em.getTransaction().begin();
 
-            // Crear la casa Slytherin
             House slytherinHouse = new House();
-            slytherinHouse.setId(1); // Asumimos que el id de la casa Slytherin es 1
+            slytherinHouse.setId(1);
             slytherinHouse.setName("Slytherin");
 
-            // Crear el headTeacher (profesor jefe de la casa)
+            House gryffindorHouse = new House();
+            gryffindorHouse.setId(2);
+            gryffindorHouse.setName("Gryffindor");
+
+            Person gryffindorHeadTeacher = new Person();
+            gryffindorHeadTeacher.setId(1);
+            gryffindorHeadTeacher.setFirstName("Minerva");
+            gryffindorHeadTeacher.setLastName("McGonagall");
+            gryffindorHeadTeacher.setHouse(gryffindorHouse);
+
+            gryffindorHouse.setHeadTeacher(gryffindorHeadTeacher);
+
+
             Person headTeacher = new Person();
-            headTeacher.setId(4); // ID del profesor
+            headTeacher.setId(2);
             headTeacher.setFirstName("Severus");
             headTeacher.setLastName("Snape");
-            // Asignar la casa al profesor
+
             headTeacher.setHouse(slytherinHouse);
 
-            // Asignar el headTeacher a la casa Slytherin
             slytherinHouse.setHeadTeacher(headTeacher);
 
-            // Crear personas (James Sirius Potter, Albus Severus Potter y Lily Luna Potter)
+
             Person james = new Person();
-            james.setId(1);
+            james.setId(3);
             james.setFirstName("James Sirius");
             james.setLastName("Potter");
             james.setHouse(slytherinHouse);
 
             Person albus = new Person();
-            albus.setId(2);
+            albus.setId(4);
             albus.setFirstName("Albus Severus");
             albus.setLastName("Potter");
             albus.setHouse(slytherinHouse);
 
             Person lily = new Person();
-            lily.setId(3);
+            lily.setId(5);
             lily.setFirstName("Lily Luna");
             lily.setLastName("Potter");
             lily.setHouse(slytherinHouse);
 
-            // Persistir las personas en la base de datos
-            em.persist(headTeacher); // Persistir el headTeacher
-            em.persist(slytherinHouse); // Persistir la casa
-            em.persist(james); // Persistir James
-            em.persist(albus); // Persistir Albus
-            em.persist(lily); // Persistir Lily
+            em.persist(headTeacher);
+            em.persist(gryffindorHeadTeacher);
+            em.persist(gryffindorHouse);
+            em.persist(slytherinHouse);
+            em.persist(james);
+            em.persist(albus);
+            em.persist(lily);
 
-            // Crear el profesor del curso Potions (por ejemplo, Horace Slughorn)
             Person potionsTeacher = new Person();
-            potionsTeacher.setId(5); // ID del profesor de Potions
+            potionsTeacher.setId(6);
             potionsTeacher.setFirstName("Horace");
             potionsTeacher.setLastName("Slughorn");
-            potionsTeacher.setHouse(slytherinHouse); // El profesor puede estar en la misma casa
+            potionsTeacher.setHouse(slytherinHouse);
 
-            // Persistir el profesor de Potions
+            Person astronomyTeacher = new Person();
+            astronomyTeacher.setId(7);
+            astronomyTeacher.setFirstName("Aurora");
+            astronomyTeacher.setLastName("Sinistra");
+            astronomyTeacher.setHouse(gryffindorHouse);
+
+            em.persist(astronomyTeacher);
+
             em.persist(potionsTeacher);
 
-            // Crear el curso "Potions" y asignar el profesor
             Course potions = new Course();
             potions.setId(1);
             potions.setName("Potions");
-            potions.setTeacher(potionsTeacher); // Asignar el profesor a Potions
+            potions.setTeacher(potionsTeacher);
 
-            // Persistir el curso
+            Course Astronomy = new Course();
+            Astronomy.setId(2);
+            Astronomy.setName("Astronomy");
+            Astronomy.setTeacher(astronomyTeacher);
+
+            em.persist(Astronomy);
             em.persist(potions);
 
-            // Matrícula de los estudiantes en el curso de Potions
             Enrollment jamesEnrollment = new Enrollment();
             jamesEnrollment.setId(new EnrollmentId(james.getId(), potions.getId()));
             jamesEnrollment.setPersonEnrollment(james);
@@ -88,12 +108,16 @@ public class Main {
             lilyEnrollment.setPersonEnrollment(lily);
             lilyEnrollment.setCourseEnrollment(potions);
 
-            // Persistir las matrículas
+            Enrollment lilysAstronomyEnrollment = new Enrollment();
+            lilysAstronomyEnrollment.setId(new EnrollmentId(lily.getId(), Astronomy.getId()));
+            lilysAstronomyEnrollment.setPersonEnrollment(lily);
+            lilysAstronomyEnrollment.setCourseEnrollment(Astronomy);
+
+            em.persist(lilysAstronomyEnrollment);
             em.persist(jamesEnrollment);
             em.persist(albusEnrollment);
             em.persist(lilyEnrollment);
 
-            // Confirmar la transacción
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
